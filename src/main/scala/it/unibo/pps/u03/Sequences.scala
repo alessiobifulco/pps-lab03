@@ -224,6 +224,11 @@ object Sequences: // Essentially, generic linkedlists
         case Cons(h, t) => _partition(t, x, Cons(h, y))
       _partition(s, Nil(), Nil())
 
+    def foldLeft[A,B](s: Sequence[A])(default: B)(op: (B,A) => B): B = s match
+      case Cons(h,t) => foldLeft(t)(op(default, h))(op)
+      case Nil() => default
+
+
 
 @main def trySequences =
   import Sequences.* 

@@ -31,19 +31,36 @@ package it.unibo.pps.u03
     ))
 
   def coursesOfTeachersFM(persons: Sequence[Person]): Sequence[String] =
-    flatMap(distinct(persons))(_ match
-      case Teacher(n,c) => Cons(c, Nil())
+    flatMap(distinct(persons)) {
+      case Teacher(n, c) => Cons(c, Nil())
       case _ => Nil()
-    )
-
-  def coursesOfTeachers2(persons: Sequence[Person]): Sequence[String] = filter(persons)(p => !isStudent(p)) match
-      case Cons(Teacher(_, c), t) => Cons(c, coursesOfTeachers2(distinct(t)))
-      case Nil() => Nil()
+    }
+//
+//  def coursesOfTeachers(persons: Sequence[Person]): Sequence[String] = filter(persons)(p => !isStudent(p)) match
+//      case Cons(Teacher(_, c), t) => Cons(c, coursesOfTeachers2(distinct(t)))
+//      case Nil()  => Nil()
 
   def totalNumberOfDistinctCourse(persons: Sequence[Person]): Int = persons match
     case Cons(Teacher(n,c), t) => totalNumberOfDistinctCourse(distinct(t)) + 1
     case Cons(Student(n, y), t) => totalNumberOfDistinctCourse(distinct(t))
     case Nil() => + 0
+
+  def totNumOfCourse(p: Sequence[Person]):Int =
+    val courses = distinct(map(filter(p)(p => !isStudent(p)))(_ match
+      case Teacher(_, c) => c
+      case _ => ""
+    ))
+    counts(courses)
+
+
+  def counts(value: Sequence[String]): Int = value match
+    case Cons(_, t) => 1 + counts(t)
+    case _ => 0
+
+
+
+
+
 
 
 
