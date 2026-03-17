@@ -182,22 +182,48 @@ object Sequences: // Essentially, generic linkedlists
         case Cons(h, t) => if contains(acc)(h) then _distinct(t, acc) else _distinct(t, concat(acc, Cons(h, Nil())))
       _distinct(s, Nil())
 
-
-
     /*
      * Group contiguous elements in the sequence
      * E.g., [10, 10, 20, 30] => [[10, 10], [20], [30]]
      * E.g., [10, 20, 30] => [[10], [20], [30]]
      * E.g., [10, 20, 20, 30] => [[10], [20, 20], [30]]
      */
-    def group[A](s: Sequence[A]): Sequence[Sequence[A]] = ???
+    def group[A](s: Sequence[A]): Sequence[Sequence[A]] = s match
+      case Cons(h, Nil()) => Cons(Cons(h, Nil()), Nil())
+      case Nil() => Nil()
+      case Cons(h, Cons(h2, t)) if h == h2 => Cons(Cons(h, Cons(h2, Nil())), group(t))
+      case Cons(h, Cons(h2, t)) if h != h2 => Cons(Cons(h, Nil()), group(Cons(h2, t)))
+
+      def group2[A](s: Sequence[A]): Sequence[Sequence[A]] =
+        @tailrec
+        def _group(s: Sequence[A], currentS: Sequence[A], acc: Sequence[Sequence[A]]): Sequence[Sequence[A]] =
+          (s, currentS) match
+            case (Nil(), Nil()) => reverse(acc)
+            case (Nil(), _) => reverse(Cons(currentS, acc))
+            case (Cons(h, t), Nil()) => _group(t, Cons(h, Nil()), acc)
+            case (Cons(h, t), Cons(hc, _)) if h == hc => _group(t, Cons(h, currentS), acc)
+            case (Cons(h, t), _) => _group(t, Cons(h, Nil()), Cons(currentS, acc))
+        _group(s,Nil(),Nil())
 
     /*
      * Partition the sequence into two sequences based on the predicate
      * E.g., [10, 20, 30] => ([10], [20, 30]) if pred is (_ < 20)
      * E.g., [11, 20, 31] => ([20], [11, 31]) if pred is (_ % 2 == 0)
      */
-    def partition[A](s: Sequence[A])(pred: A => Boolean): (Sequence[A], Sequence[A]) = ???
+    def partition[A](s: Sequence[A])(pred: A => Boolean): (Sequence[A], Sequence[A]) = s match
+      case Nil() => (Nil(), Nil())
+      case Cons(h,t) =>
+        val(x,y) = partition(t)(pred)
+        if pred(h) then (Cons(h, x),y) else (x, Cons(h,y))
+
+    def partition2[A](s: Sequence[A])(pred: A => Boolean): (Sequence[A], Sequence[A]) =
+      @tailrec
+      def _partition(s: Sequence[A], x: Sequence[A], y: Sequence[A]): (Sequence[A], Sequence[A]) = s match
+        case Nil() => (reverse(x), reverse(y))
+        case Cons(h, t) if pred(h) => _partition(t, Cons(h, x), y)
+        case Cons(h, t) => _partition(t, x, Cons(h, y))
+      _partition(s, Nil(), Nil())
+
 
 @main def trySequences =
   import Sequences.* 

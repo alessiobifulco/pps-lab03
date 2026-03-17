@@ -74,6 +74,7 @@ class SequenceTest:
     assertEquals(group(sequence), grouped)
     assertEquals(Nil(), group(Nil()))
 
+
   @Test def testPartition() =
     val sequence = Cons(11, Cons(20, Cons(31, Nil())))
     val (even, odd) = partition(sequence)(x => x % 2 == 0)
